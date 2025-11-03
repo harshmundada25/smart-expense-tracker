@@ -162,6 +162,15 @@ st.markdown("""
 conn = sqlite3.connect("database.db", check_same_thread=False)
 c = conn.cursor()
 
+try:
+    # Check if created_at column exists in users table
+    c.execute("SELECT created_at FROM users LIMIT 1")
+except sqlite3.OperationalError:
+    # Column doesn't exist, add it
+    c.execute("ALTER TABLE users ADD COLUMN created_at TEXT DEFAULT '2024-01-01'")
+    conn.commit()
+    print("Added created_at column to users table")
+
 # Create users table
 c.execute('''CREATE TABLE IF NOT EXISTS users (
     username TEXT PRIMARY KEY,
